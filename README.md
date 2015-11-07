@@ -33,6 +33,14 @@ TokenBoy可以只需要简单的配置即可使用。除了可以用于微信，
 
 <b>python3 tokenBoy.py </b>
 
+访问 http://127.0.0.1:8888/token?name=weixin
+返回如下：
+
+    {"token": "TJWDx-v1a4YV6ZUEpG9P5dtiK3n62J0mxBC99NMy1Mz3aL0KnIk19qJWvbmSyXMORHJTbVwrTZXF8-K_6F7jpInGMfxjlBY8xOc18YItKeYOKXcADAZVI"}
+    
+其他需要使用Token的代码可以通过以上的方式从tokenBoy获取当前有效的token
+
+也就是tokenBoy从微信服务器获取token，其他程序从tokenBoy获取token →_→
 
 # 依赖
 
