@@ -56,7 +56,6 @@ def token_refresher():
 
 if __name__ == "__main__":
     application.listen(config.bind_port,address=config.bind_ip)
-    token_refresher()
-    tornado.ioloop.PeriodicCallback(token_refresher,10000).start()
+    tornado.ioloop.IOLoop.instance().call_later(0, token_refresher)
+    tornado.ioloop.PeriodicCallback(token_refresher,7000*1000).start()
     tornado.ioloop.IOLoop.instance().start()
-
