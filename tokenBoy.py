@@ -50,14 +50,12 @@ def token_refresher():
         request = tornado.httpclient.HTTPRequest( url, method=config.token_sources[key]['method']  )
         async_http_client.fetch( request, callback=handle_factory(key) )
 
-    #add next timer
-    tornado.ioloop.IOLoop.instance().call_later(3600, token_refresher)
 
 
 
 
 if __name__ == "__main__":
     application.listen(config.bind_port,address=config.bind_ip)
-    tornado.ioloop.IOLoop.instance().call_later(1, token_refresher)
+    tornado.ioloop.IOLoop.instance().call_later(0, token_refresher)
+    tornado.ioloop.PeriodicCallback(token_refresher,7000*1000).start()
     tornado.ioloop.IOLoop.instance().start()
-
