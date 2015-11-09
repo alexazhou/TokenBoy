@@ -37,19 +37,25 @@ def token_refresher():
     for key in config.token_sources.keys():    
         def handle_factory( key):
             def handle(response):
-                #print('async httpclient response: ',response)
+                print('async httpclient response: ',response)
                 print('async httpclient response body: ',response.body)
-                ret_dict = json.loads( response.body.decode('utf8') )
-                tokens[key] = ret_dict['access_token']               
-                print('%s token:%s'%(key,tokens[key])) 
+                if response.code == 200:
+                    ret_dict = json.loads( response.body.decode('utf8') )
+                    tokens[key] = ret_dict['access_token']               
+                    print('%s token:%s'%(key,tokens[key])) 
+                else:
+                    print('request token %s error, now retry '%key)
+                    refresh(key)
             return handle            
 
-        #body = urllib.parse.urlencode(config.token_sources[key]['args'])
-        url = tornado.httputil.url_concat( config.token_sources[key]['url'], config.token_sources[key]['args'] )
-        async_http_client = tornado.httpclient.AsyncHTTPClient()
-        request = tornado.httpclient.HTTPRequest( url, method=config.token_sources[key]['method']  )
-        async_http_client.fetch( request, callback=handle_factory(key) )
-
+        def refresh( key ):
+            #body = urllib.parse.urlencode(config.token_sources[key]['args'])
+            url = tornado.httputil.url_concat( config.token_sources[key]['url'], config.token_sources[key]['args'] )
+            async_http_client = tornado.httpclient.AsyncHTTPClient()
+            request = tornado.httpclient.HTTPRequest( url, method=config.token_sources[key]['method']  )
+            async_http_client.fetch( request, callback=handle_factory(key) )
+        
+        refresh(key)
 
 
 
