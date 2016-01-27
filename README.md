@@ -16,10 +16,12 @@ TokenBoy可以只需要简单的配置即可使用。除了可以用于微信，
 
 ###特性：
 
+* 支持自定义请求参数
 * 支持同时添加多组配置  
 * 参数中支持引用获取到的结果
 
-编辑 config.py，设置需要监听的ip地址和端口，以及获取Token的接口。
+下面的例子是一组配置，中包含了监听本地8888端口，配置获取微信access_token以及微信jssdk ticket，其中获取jssdk时，使用了之前获取到的access_token作为请求参数。
+
 
     bind_ip = '0.0.0.0'
     bind_port = 8888
@@ -35,21 +37,22 @@ TokenBoy可以只需要简单的配置即可使用。除了可以用于微信，
         }
     }
     
-    ps：这里可以用不同的名字(key)添加多组信息，tokenBoy都会进行刷新。后面获取的时候使用对应的名字获取即可
-    #A example config for weixin JSSDK token
+    #A example config for weixin JSSDK ticket
 	token_sources['weixin_jsticket'] = {
     	'url':'https://api.weixin.qq.com/cgi-bin/ticket/getticket',
     	'method':'GET',
     	'args':{
     	    'type':'jsapi',
-    	    'access_token':'{{results.weixin.access_token}}' #this means the args is the access_token or weixin group
+    	    'access_token':'{{results.weixin.access_token}}' #这里使用了微信access_token作为请求参数"
     	},
 	}
-	
-	#这里的获取微信jssdk ticket时引用了微信token作为参数
 
-    
+###模版引用：
+"{{}}"中的内容即表示模版引用，上面的例子中weixin在这里是组别，access_token为要选用的键
+
 # 运行
+
+编辑 config.py，设置需要监听的ip地址和端口，以及获取Token的接口，然后执行
 
 <b>python3 tokenBoy.py </b>
 
@@ -61,6 +64,9 @@ TokenBoy可以只需要简单的配置即可使用。除了可以用于微信，
 其他需要使用Token的代码可以通过以上的方式从tokenBoy获取当前有效的token
 
 也就是tokenBoy从微信服务器获取token，其他程序从tokenBoy获取token →_→
+
+###注意事项
+TokenBoy是一个简单专注的程序，所以并不包含身份认证相关的功能。为了避免token泄露，最好将TokenBoy放置在内网，或者配置为只监听127.0.0.1地址。
 
 # 依赖
 
