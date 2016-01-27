@@ -14,11 +14,17 @@ TokenBoy就是为了解决这个问题而存在。
 
 TokenBoy可以只需要简单的配置即可使用。除了可以用于微信，还可以用于其他有类似接口的地方。
 
+###特性：
+
+* 支持同时添加多组配置  
+* 参数中支持引用获取到的结果
+
 编辑 config.py，设置需要监听的ip地址和端口，以及获取Token的接口。
 
     bind_ip = '0.0.0.0'
     bind_port = 8888
 
+    //weixin example
     token_sources['weixin'] = {
         'url':'https://api.weixin.qq.com/cgi-bin/token',
         'method':'GET',
@@ -30,6 +36,18 @@ TokenBoy可以只需要简单的配置即可使用。除了可以用于微信，
     }
     
     ps：这里可以用不同的名字(key)添加多组信息，tokenBoy都会进行刷新。后面获取的时候使用对应的名字获取即可
+    #A example config for weixin JSSDK token
+	token_sources['weixin_jsticket'] = {
+    	'url':'https://api.weixin.qq.com/cgi-bin/ticket/getticket',
+    	'method':'GET',
+    	'args':{
+    	    'type':'jsapi',
+    	    'access_token':'{{results.weixin.access_token}}' #this means the args is the access_token or weixin group
+    	},
+	}
+	
+	#这里的获取微信jssdk ticket时引用了微信token作为参数
+
     
 # 运行
 
@@ -38,7 +56,7 @@ TokenBoy可以只需要简单的配置即可使用。除了可以用于微信，
 访问 http://127.0.0.1:8888/token?name=weixin
 返回如下：
 
-    {"token": "TJWDx-v1a4YV6ZUEpG9P5dtiK3n62J0mxBC99NMy1Mz3aL0KnIk19qJWvbmSyXMORHJTbVwrTZXF8-K_6F7jpInGMfxjlBY8xOc18YItKeYOKXcADAZVI"}
+    {"access_token": "lQ0ztuo3HJuiflq28rtnEVpgSCpcWjUfQW7ROtNavNA09w-B3Z0y_WWbFsWr3GPPKumx-dnMfg325qk0ZzzGsQQyYCjAVNbolESaDFsdLGUFVLhAGATJZ", "expires_in": 7200}
     
 其他需要使用Token的代码可以通过以上的方式从tokenBoy获取当前有效的token
 
