@@ -47,19 +47,20 @@ def args_render( s ):
         #print('render result:',target)
         return target
     else:
-        return s 
+        return s
 
 def refresh_token(group):
-    
+
     print('refresh group:',group)
 
-    def handle(response):
-        #print('async httpclient response: ',response)
-        #print('async httpclient response body: ',response.body)
+    def handle(future):
+        response = future.result()
+        # print('async httpclient response: ',response)
+        # print('async httpclient response body: ',response.body)
         if response.code == 200:
             ret_dict = json.loads( response.body.decode('utf8') )
             tokens[group] = ret_dict
-            print('%s request ret:%s'%(group,tokens[group])) 
+            print('%s request ret:%s'%(group,tokens[group]))
         else:
             print('request token %s error, will retry after 10s'%group)
             tornado.ioloop.IOLoop.instance().call_later(10, refresh_token, group)
@@ -73,8 +74,9 @@ def refresh_token(group):
         url = tornado.httputil.url_concat( config.token_sources[group]['url'], args )
         async_http_client = tornado.httpclient.AsyncHTTPClient()
         request = tornado.httpclient.HTTPRequest( url, method=config.token_sources[group]['method']  )
-        async_http_client.fetch( request, callback = handle )
-    
+        future = async_http_client.fetch( request )
+        future.add_done_callback(handle)
+
     except Exception as e:
         print('Exception:',e)
         print('build request for %s failed, will retry after 10s'%group)
@@ -84,8 +86,8 @@ def refresh_token(group):
 
 def refresh_all_token():
     print('begin refresh all token...')
-    
-    for group in config.token_sources.keys():    
+
+    for group in config.token_sources.keys():
         refresh_token(group)
 
 
